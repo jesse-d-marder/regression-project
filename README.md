@@ -45,7 +45,7 @@ For this project I followed the data science pipeline:
 
 Planning: I established the goals for this project and the relevant questions I wanted to answer. I developed a Trello board (https://trello.com/b/yCRSVyiw/telco-churn-classification-project) to help keep track of open and completed work.
 
-Acquire: The data for this project is from a SQL Database called 'telco_churn'. The acquire.py script is used to query the database for the required data tables and returns the data in a Pandas DataFrame. This script also saves the DataFrame to a .csv file for faster subsequent loads. The script will check if the telco_churn.csv file exists in the current directory and if so will load it into memory, skipping the SQL query.
+Acquire: The data for this project is from a SQL Database called 'zillow'. The acquire.py script is used to query the database for the required data tables and returns the data in a Pandas DataFrame. This script also saves the DataFrame to a .csv file for faster subsequent loads. The script will check if the telco_churn.csv file exists in the current directory and if so will load it into memory, skipping the SQL query.
 
 Prepare: The prepare.py script has a prep_telco function that takes as an argument the Pandas DataFrame acquired from acquire.py and prepares the data for exploration and modeling. Steps here include removing null values (NaN), converting data types, and encoding categorical variables. The function also drops unnecessary columns. This script also contains a train_validate_test_split function to split the dataset into train, validate, and test sets cleanly.
 
