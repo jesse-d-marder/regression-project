@@ -15,7 +15,7 @@ def wrangle_zillow():
     else:
         print("Acquiring data from server")
         query = """
-            SELECT bedroomcnt, bathroomcnt, calculatedfinishedsquarefeet, taxvaluedollarcnt, transactiondate, fips
+            SELECT bedroomcnt, bathroomcnt, calculatedfinishedsquarefeet, taxvaluedollarcnt, fips
             FROM predictions_2017
             JOIN properties_2017
             USING (parcelid)
