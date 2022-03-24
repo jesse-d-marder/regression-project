@@ -6,7 +6,7 @@ import numpy as np
 from env import get_db_url
 
 def wrangle_zillow():
-    
+    """ Acquires the Zillow housing data from the SQL database or a cached CSV file. Renames columns and outputs data as a Pandas DataFrame"""
     # Acquire data from CSV if exists
     if os.path.exists('zillow_2017.csv'):
         print("Using cached data")

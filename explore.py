@@ -53,10 +53,13 @@ def plot_boxplots(df, columns):
 def plot_variable_pairs(df, numerics, categoricals, sample_amt):
     """ Plots pairwise relationships between numeric variables in df along with regression line for each pair. Uses categoricals for hue."""
     # Sampling allows for faster plotting with large datasets at the expense of not seeing all datapoints
+    # Checks if a sample amount was inputted
     if sample_amt:
         df = df.sample(sample_amt)
+    # Checks if any categorical variables were given to determine how to set the lmplot regression line parameters
     if len(categoricals)==0:
         categoricals = [None]
+        # Setting to red makes it easier to see against the default color
         line_kws = {'lw':4, 'color':'red'}
     else:
         line_kws = {'lw':4}
@@ -80,7 +83,7 @@ def plot_categorical_and_continuous_vars(df, categorical, continuous, sample_amt
     # Sampling allows for faster plotting with large datasets at the expense of not seeing all datapoints
     if sample_amt:
         df = df.sample(sample_amt)
-        
+    # Outputs 3 plots showing high level summary of the inputted data
     for num in continuous:
         for cat in categorical:
             _, ax = plt.subplots(1,3,figsize=(20,8))
