@@ -15,7 +15,7 @@ def wrangle_zillow():
     else:
         print("Acquiring data from server")
         query = """
-            SELECT bedroomcnt, bathroomcnt, calculatedfinishedsquarefeet, taxvaluedollarcnt, fips, garagecarcnt, yearbuilt, buildingqualitytypeid, regionidzip, poolcnt
+            SELECT bedroomcnt, bathroomcnt, calculatedfinishedsquarefeet, taxvaluedollarcnt, fips, garagecarcnt, yearbuilt, buildingqualitytypeid, regionidzip, poolcnt, lotsizesquarefeet
             FROM predictions_2017
             JOIN properties_2017
             USING (parcelid)
@@ -38,10 +38,53 @@ def wrangle_zillow():
                             'garagecarcnt':'garage',
                            'buildingqualitytypeid':'condition',
                            'regionidzip':'zip',
-                           'poolcnt':'pool'})
+                           'poolcnt':'pool',
+                           'lotsizesquarefeet':'lot_size'})
     df.garage = df.garage.fillna(0)
     df.pool = df.pool.fillna(0)
     
+    # Make column for home age
+    df["age"] = 2017 - df.yearbuilt
+    
+    # Make a column for living space. Average bathroom is 40 sq ft, average bedroom is 200 sq ft
+    df["living_space"] = df.square_feet - (df.bathroom*40 + df.bedroom*200)
+    
+    # Number of rooms in the house (bath and bed)
+    df["room_count"] = df.bathroom + df.bedroom
+    
+    # Make a column for the county based on FIPS
+    df["county"] = np.select([df.fips == 6037, df.fips==6059, df.fips == 6111],["Los Angeles County", "Orange County", "Ventura County"])
+    
+    
+    def bedroom_mapper(num):
+        """ Map the number of bedrooms to a categorical label """
+        if num <= 2:
+            return "2_or_less"
+        elif num <=3:
+            return "3"
+        elif num > 3:
+            return "more_than_3"
+    def bathroom_mapper(num):
+        """ Map the number of bathrooms to a categorical label """
+        if num == 2:
+            return "2"
+        elif num < 2:
+            return "less_than_2"
+        elif num > 2:
+            return "more_than_2"
+    
+    df["bedroom_cat"] = df.bedroom.apply(lambda row: bedroom_mapper(row))
+    df["bathroom_cat"] = df.bathroom.apply(lambda row: bathroom_mapper(row))
+
+
+    df["has_garage"] = np.where(df.garage>0, True, False)
+
+    df["bed_to_bath"] = (df.bedroom/df.bathroom).replace(np.inf, 0).fillna(0)
+
+    # Condition data only available for fips 6037.0. Will be dropping nans going forward but do not want to drop every row from other fips.
+    df.condition = df.condition.fillna(0)
+
+
 #     # Drops the rows with Null values, representing a very small percentage of the dataset (<0.6%)
 #     df = df.dropna()
     
