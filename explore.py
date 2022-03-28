@@ -50,7 +50,7 @@ def plot_boxplots(df, columns):
 
     plt.show()
 
-def plot_variable_pairs(df, numerics, categoricals, sample_amt):
+def plot_variable_pairs(df, numerics, categoricals, targets, sample_amt):
     """ Plots pairwise relationships between numeric variables in df along with regression line for each pair. Uses categoricals for hue."""
     # Sampling allows for faster plotting with large datasets at the expense of not seeing all datapoints
     # Checks if a sample amount was inputted
@@ -65,7 +65,7 @@ def plot_variable_pairs(df, numerics, categoricals, sample_amt):
         line_kws = {'lw':4}
     for cat in categoricals:    
         for col in numerics:
-            for y in numerics:
+            for y in targets:
                 if y == col:
                     continue
                 sns.lmplot(data = df, 

@@ -15,7 +15,7 @@ def wrangle_zillow():
     else:
         print("Acquiring data from server")
         query = """
-            SELECT bedroomcnt, bathroomcnt, calculatedfinishedsquarefeet, taxvaluedollarcnt, fips
+            SELECT bedroomcnt, bathroomcnt, calculatedfinishedsquarefeet, taxvaluedollarcnt, fips, garagecarcnt, yearbuilt, buildingqualitytypeid, regionidzip, poolcnt
             FROM predictions_2017
             JOIN properties_2017
             USING (parcelid)
@@ -34,7 +34,13 @@ def wrangle_zillow():
     df=df.rename(columns = {'bedroomcnt':'bedroom', 
                             'bathroomcnt':'bathroom', 
                             'calculatedfinishedsquarefeet':'square_feet',
-                            'taxvaluedollarcnt':'tax_value'})
+                            'taxvaluedollarcnt':'tax_value',
+                            'garagecarcnt':'garage',
+                           'buildingqualitytypeid':'condition',
+                           'regionidzip':'zip',
+                           'poolcnt':'pool'})
+    df.garage = df.garage.fillna(0)
+    df.pool = df.pool.fillna(0)
     
 #     # Drops the rows with Null values, representing a very small percentage of the dataset (<0.6%)
 #     df = df.dropna()
