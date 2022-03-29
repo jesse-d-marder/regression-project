@@ -53,7 +53,7 @@ The goal of this project was to identify key drivers of property value for singl
 
 For this project I followed the data science pipeline:
 
-Planning: I established the goals for this project and the relevant questions I wanted to answer. I developed a Trello board to help keep track of open and completed work.
+Planning: I established the goals for this project and the relevant questions I wanted to answer. I developed a Trello board to help keep track of open and completed work (https://trello.com/b/mT9nMlHN/zillow-regression-project).
 
 Acquire: The data for this project is from a SQL Database called 'zillow'. The wrangle.py script is used to query the database for the required data tables and returns the data in a Pandas DataFrame. This script also saves the DataFrame to a .csv file for faster subsequent loads. The script will check if the zillow_2017.csv file exists in the current directory and if so will load it into memory, skipping the SQL query.
 

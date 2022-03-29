@@ -80,6 +80,7 @@ def plot_variable_pairs(df, numerics, categoricals, targets, sample_amt):
 
 def plot_categorical_and_continuous_vars(df, categorical, continuous, sample_amt):
     """ Accepts dataframe and lists of categorical and continuous variables and outputs plots to visualize the variables"""
+    sns.set(font_scale=1.2)
     # Sampling allows for faster plotting with large datasets at the expense of not seeing all datapoints
     if sample_amt:
         df = df.sample(sample_amt)
