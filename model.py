@@ -25,7 +25,7 @@ def model_feature_selection(train, validate, test, to_dummy, features_to_scale, 
     # Initialize ML algorithm
     lm = LinearRegression()
     # create RFE object - selects top 3 features only
-    rfe = RFE(lm, n_features_to_select=5)
+    rfe = RFE(lm, n_features_to_select=3)
     # fit the data using RFE
     rfe.fit(X_train_scaled, y_train)
     # get mask of columns selected
@@ -45,7 +45,7 @@ def model_feature_selection(train, validate, test, to_dummy, features_to_scale, 
 
     return X_train_scaled, X_validate_scaled, X_test_scaled, y_train, y_validate, y_test, rfe_features
     
-def model(X_train_scaled, X_validate_scaled, X_test_scaled, y_train, y_validate, y_test,rfe_features):
+def model(X_train_scaled, X_validate_scaled, X_test_scaled, y_train, y_validate, y_test,rfe_features, show_test = False, print_results = True):
     
     ### BASELINE
     
@@ -62,15 +62,17 @@ def model(X_train_scaled, X_validate_scaled, X_test_scaled, y_train, y_validate,
     # 3. RMSE of tax_value_pred_mean
     rmse_train = mean_squared_error(y_train.tax_value, y_train.tax_value_pred_mean)**(1/2)
     rmse_validate = mean_squared_error(y_validate.tax_value, y_validate.tax_value_pred_mean)**(1/2)
-
-    print("RMSE using Mean\nTrain/In-Sample: ", round(rmse_train, 2), 
+    if print_results:
+        print("RMSE using Mean\nTrain/In-Sample: ", round(rmse_train, 2), 
           "\nValidate/Out-of-Sample: ", round(rmse_validate, 2))
 
     # 4. RMSE of tax_value_pred_median
     rmse_train = mean_squared_error(y_train.tax_value, y_train.tax_value_pred_median)**(1/2)
     rmse_validate = mean_squared_error(y_validate.tax_value, y_validate.tax_value_pred_median)**(1/2)
 
-    print("RMSE using Median\nTrain/In-Sample: ", round(rmse_train, 2), 
+    if print_results:
+
+        print("RMSE using Median\nTrain/In-Sample: ", round(rmse_train, 2), 
           "\nValidate/Out-of-Sample: ", round(rmse_validate, 2))
 
     ### OLS Linear Regression
@@ -94,9 +96,15 @@ def model(X_train_scaled, X_validate_scaled, X_test_scaled, y_train, y_validate,
     # evaluate: rmse
     rmse_validate = mean_squared_error(y_validate.tax_value, y_validate.tax_value_pred_lm)**(1/2)
 
-    print("RMSE for OLS using LinearRegression\nTraining/In-Sample: ", rmse_train, 
+    if print_results:
+        print("RMSE for OLS using LinearRegression\nTraining/In-Sample: ", rmse_train, 
           "\nValidation/Out-of-Sample: ", rmse_validate)
-
+    
+    # predict test
+    if show_test:
+        
+        y_test['tax_value_pred_lm'] = lm.predict(X_test_scaled)
+        rmse_test = mean_squared_error(y_test.tax_value, y_test.tax_value_pred_lm)**(1/2)
 
     # Lasso-Lars
     
@@ -119,9 +127,16 @@ def model(X_train_scaled, X_validate_scaled, X_test_scaled, y_train, y_validate,
     # evaluate: rmse
     rmse_validate = mean_squared_error(y_validate.tax_value, y_validate.tax_value_pred_lars)**(1/2)
 
-    print("RMSE for OLS using LarsLasso\nTraining/In-Sample: ", rmse_train, 
+    if print_results:
+
+        print("RMSE for OLS using LarsLasso\nTraining/In-Sample: ", rmse_train, 
           "\nValidation/Out-of-Sample: ", rmse_validate)
 
+    # predict test
+    if show_test:
+        
+        y_test['tax_value_pred_lars'] = lars.predict(X_test_scaled)
+        rmse_test = mean_squared_error(y_test.tax_value, y_test.tax_value_pred_lars)**(1/2)
 
     # Tweedie
     
@@ -143,9 +158,16 @@ def model(X_train_scaled, X_validate_scaled, X_test_scaled, y_train, y_validate,
 
     # evaluate: rmse
     rmse_validate = mean_squared_error(y_validate.tax_value, y_validate.tax_value_pred_glm)**(1/2)
-
-    print("RMSE for GLM using Tweedie, power=1 & alpha=0\nTraining/In-Sample: ", rmse_train, 
+    
+    if print_results:
+        print("RMSE for GLM using Tweedie, power=1 & alpha=0\nTraining/In-Sample: ", rmse_train, 
           "\nValidation/Out-of-Sample: ", rmse_validate)
+        
+    # predict test
+    if show_test:
+        
+        y_test['tax_value_pred_glm'] = glm.predict(X_test_scaled)
+        rmse_test = mean_squared_error(y_test.tax_value, y_test.tax_value_pred_glm)**(1/2)
 
     # Polynomial features
     # make the polynomial features to get a new set of features
@@ -176,9 +198,16 @@ def model(X_train_scaled, X_validate_scaled, X_test_scaled, y_train, y_validate,
 
     # evaluate: rmse
     rmse_validate = mean_squared_error(y_validate.tax_value, y_validate.tax_value_pred_lm2)**(1/2)
-
-    print("RMSE for Polynomial Model, degrees=2\nTraining/In-Sample: ", rmse_train, 
+    
+    if print_results:
+        print("RMSE for Polynomial Model, degrees=2\nTraining/In-Sample: ", rmse_train, 
           "\nValidation/Out-of-Sample: ", rmse_validate)
+        
+    # predict test
+    if show_test:
+        
+        y_test['tax_value_pred_lm2'] = lm2.predict(X_test_degree2)
+        rmse_test = mean_squared_error(y_test.tax_value, y_test.tax_value_pred_lm2)**(1/2)
 
     results = pd.concat([
     y_validate.apply(lambda col: r2_score(y_validate.tax_value, col)).rename('r2'),
@@ -186,6 +215,16 @@ def model(X_train_scaled, X_validate_scaled, X_test_scaled, y_train, y_validate,
     ], axis=1).assign(
         rmse=lambda df: df.mse.apply(lambda x: x**0.5)
     )
-    
+    if show_test:
+        results = pd.concat([
+        y_validate.apply(lambda col: r2_score(y_validate.tax_value, col)).rename('r2'),
+        y_validate.apply(lambda col: mean_squared_error(y_validate.tax_value, col)).rename('mse'),
+        y_test.apply(lambda col: r2_score(y_test.tax_value, col)).rename('r2_test'),
+        y_test.apply(lambda col: mean_squared_error(y_test.tax_value, col)).rename('mse_test'),
+        ], axis=1).assign(
+            rmse=lambda df: df.mse.apply(lambda x: x**0.5)
+        )
+        
+        results = results.assign(rmse_test= lambda results: results.mse_test.apply(lambda x: x**0.5))
     return results
 

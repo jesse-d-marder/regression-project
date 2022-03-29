@@ -54,6 +54,7 @@ def wrangle_zillow():
     
     # Make a column for the county based on FIPS
     df["county"] = np.select([df.fips == 6037, df.fips==6059, df.fips == 6111],["Los Angeles County", "Orange County", "Ventura County"])
+    df["is_LA"] = np.where(df.county == "Los Angeles County", 1, 0)
     
     
     def bedroom_mapper(num):
