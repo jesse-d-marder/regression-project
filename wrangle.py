@@ -163,7 +163,7 @@ def remove_outliers(df, k, col_list):
     
     df = df[df.outlier == False]
     df.drop(columns=['outlier'], inplace=True)
-    print(f"Number of observations removed: {num_obs - df.shape[0]}")
+    # print(f"Number of observations removed: {num_obs - df.shape[0]}")
         
     return df
 
@@ -186,6 +186,6 @@ def remove_outliers_std(df, k, col_list):
     
     df = df[df.outlier == False]
     df.drop(columns=['outlier'], inplace=True)
-    print(f"Number of observations removed: {num_obs - df.shape[0]}")
+    # print(f"Number of observations removed: {num_obs - df.shape[0]}")
         
     return df
