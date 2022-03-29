@@ -2,12 +2,12 @@
 
 ## Repo contents:
 ### 1. This Readme:
-    - Project description with goals
-    - Inital hypothesis/questions on data, ideas
-    - Data dictionary
-    - Project planning
-    - Instructions for reproducing this project and findings
-    - Key findings and recommendations for this project
+- Project description with goals
+- Inital hypothesis/questions on data, ideas
+- Data dictionary
+- Project planning
+- Instructions for reproducing this project and findings
+- Key findings and recommendations for this project
 ### 2. Final report (final_report.ipynb)
 ### 3. Wrangle module (wrangle.py)
 ### 4. Exploration & modeling notebooks (prepare_explore_model.ipynb)
