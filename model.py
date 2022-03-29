@@ -8,15 +8,20 @@ import wrangle
 
 
 def model_feature_selection(train, validate, test, to_dummy, features_to_scale, columns_to_use):
+    """ Performs scaling and feature selection using recursive feature elimination. Performs operations on all three inputed data sets. Requires lists of features to encode (dummy), features to scale, and columns (features) to input to the feature elimination. """
     
+    # Gets dummy variables
     X_train_exp = pd.get_dummies(train, columns = to_dummy, drop_first=True)
     
+    # Gets dummy variables for validate and test sets as well for later use
     X_train = X_train_exp[columns_to_use]
     X_validate = pd.get_dummies(validate, columns = to_dummy, drop_first=True)[columns_to_use]
     X_test = pd.get_dummies(test, columns = to_dummy, drop_first=True)[columns_to_use]
     
+    # Scale train, validate, and test sets using the scale_data function from wrangle.pu
     X_train_scaled, X_validate_scaled, X_test_scaled = wrangle.scale_data(X_train, X_validate, X_test,features_to_scale, 'Standard')
     
+    # Set up the dependent variable in a datafrane
     y_train = train[['tax_value']]
     y_validate = validate[['tax_value']]
     y_test = test[['tax_value']]
@@ -45,7 +50,8 @@ def model_feature_selection(train, validate, test, to_dummy, features_to_scale, 
 
     return X_train_scaled, X_validate_scaled, X_test_scaled, y_train, y_validate, y_test, rfe_features
     
-def model(X_train_scaled, X_validate_scaled, X_test_scaled, y_train, y_validate, y_test,rfe_features, show_test = False, print_results = True):
+def model(X_train_scaled, X_validate_scaled, X_test_scaled, y_train, y_validate, y_test, rfe_features, show_test = False, print_results = True):
+    """ Fits data to different regression algorithms and evaluates on validate (and test if desired for final product). Outputs metrics for each algorithm (r2, rmse) as a Pandas DataFrame. """
     
     ### BASELINE
     
@@ -217,14 +223,17 @@ def model(X_train_scaled, X_validate_scaled, X_test_scaled, y_train, y_validate,
     )
     if show_test:
         results = pd.concat([
-        y_validate.apply(lambda col: r2_score(y_validate.tax_value, col)).rename('r2'),
-        y_validate.apply(lambda col: mean_squared_error(y_validate.tax_value, col)).rename('mse'),
+        y_train.apply(lambda col: r2_score(y_train.tax_value, col)).rename('r2_train'),
+        y_train.apply(lambda col: mean_squared_error(y_train.tax_value, col)).rename('mse_train'),
+        y_validate.apply(lambda col: r2_score(y_validate.tax_value, col)).rename('r2_validate'),
+        y_validate.apply(lambda col: mean_squared_error(y_validate.tax_value, col)).rename('mse_validate'),
         y_test.apply(lambda col: r2_score(y_test.tax_value, col)).rename('r2_test'),
         y_test.apply(lambda col: mean_squared_error(y_test.tax_value, col)).rename('mse_test'),
         ], axis=1).assign(
-            rmse=lambda df: df.mse.apply(lambda x: x**0.5)
+            rmse_validate=lambda df: df.mse_validate.apply(lambda x: x**0.5)
         )
         
+        results = results.assign(rmse_train= lambda results: results.mse_train.apply(lambda x: x**0.5))
         results = results.assign(rmse_test= lambda results: results.mse_test.apply(lambda x: x**0.5))
     return results
 

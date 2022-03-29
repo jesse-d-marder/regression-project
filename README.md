@@ -10,8 +10,8 @@
     - Key findings and recommendations for this project
 ### 2. Final report (final_report.ipynb)
 ### 3. Wrangle module (wrangle.py)
-### 4. Exploration & modeling notebooks (model_testing.ipynb, explore.ipynb)
-### 5. Functions to support modeling work (model.py)
+### 4. Exploration & modeling notebooks (prepare_explore_model.ipynb)
+### 5. Functions to support exploration and modeling work (explore.py, model.py)
 
 ### Project Goals
 
@@ -74,7 +74,17 @@ Delivery: This is in the form of this github repository as well as a presentatio
 
 ### Key Findings and Recommendations
 
-- 
+- Location, living space, and age were shown to be moderately correlated with tax value.
+- Average tax value looks to be higher than the overall average for more than 3 bedrooms and lower for 3 or less:
+- Average tax value looks to be higher than the overall average for more than 2 bathrooms and lower for 2 or less
+- Seems to be a linear relationship between square feet and tax value
+- Having a garage adds value to a home
+- The greater the age the lower the value in general
+- The county the home is in affects the tax value: LA looks to be less than other two
+- Having a pool seems more valuable than not
+- Several regression models were trained and evaluated to attempt to predict tax assessed values of single family properties. Improvements of over 20% over baseline were achieved although r2 and RMSE values were poor enough that I cannot recommend these models for production.
+- Additional feature engineering work may help improve performance.
+- Ultimately the dataset lacks key information that would likely be more predictive of tax assessed value, such as finer neighborhood information and home condition (although this is available for one county it was not shown to be particularly predictive). 
 
 ### Future work
 

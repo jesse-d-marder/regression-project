@@ -54,6 +54,8 @@ def wrangle_zillow():
     
     # Make a column for the county based on FIPS
     df["county"] = np.select([df.fips == 6037, df.fips==6059, df.fips == 6111],["Los Angeles County", "Orange County", "Ventura County"])
+    
+    # LA homes seem to have fairly different tax value characteristics to other counties
     df["is_LA"] = np.where(df.county == "Los Angeles County", 1, 0)
     
     
@@ -74,25 +76,18 @@ def wrangle_zillow():
         elif num > 2:
             return "more_than_2"
     
+    # Categorize bedroom and bathroom counts
     df["bedroom_cat"] = df.bedroom.apply(lambda row: bedroom_mapper(row))
     df["bathroom_cat"] = df.bathroom.apply(lambda row: bathroom_mapper(row))
-
-
+    
+    # Encode whether home has a garage
     df["has_garage"] = np.where(df.garage>0, 1, 0)
-
+    
+    # Test the bed to bathroom ratio as a feature
     df["bed_to_bath"] = (df.bedroom/df.bathroom).replace(np.inf, 0).fillna(0)
 
     # Condition data only available for fips 6037.0. Will be dropping nans going forward but do not want to drop every row from other fips.
     df.condition = df.condition.fillna(0)
-
-
-#     # Drops the rows with Null values, representing a very small percentage of the dataset (<0.6%)
-#     df = df.dropna()
-    
-#     # Convert year built column to integer from float
-#     df.year_built = df.year_built.astype('int64')
-#     df.bedroom_cnt = df.bedroom_cnt.astype('int64')
-
 
     return df
 
@@ -118,7 +113,7 @@ def scale_data(train, validate, test, features_to_scale, scaler_type):
     Accepts train, validate, and test datasets as inputs as well as a list of the features to scale. 
     Returns dataframe with scaled values added on as columns"""
     
-    # Fit the scaler to train data only
+    # Select which scaler to use
     if scaler_type == 'MinMax':
         scaler = sklearn.preprocessing.MinMaxScaler()
     elif scaler_type == 'Standard':
@@ -129,6 +124,7 @@ def scale_data(train, validate, test, features_to_scale, scaler_type):
         print("Invalid scaler entry, using MinMax")
         scaler = sklearn.preprocessing.MinMaxScaler()
         
+    # Fit the scaler to train data only.     
     scaler.fit(train[features_to_scale])
     
     # Generate a list of the new column names with _scaled added on
@@ -148,7 +144,7 @@ def scale_data(train, validate, test, features_to_scale, scaler_type):
     return train_scaled, validate_scaled, test_scaled
 
 def remove_outliers(df, k, col_list):
-    ''' Removes outliers based on multiple of IQR. Accepts as arguments the dataframe, the k value for number of IQR to use as threshold, and the list of columns. Outputs a dataframe without the outliers.
+    ''' From the class. Removes outliers based on multiple of IQR. Accepts as arguments the dataframe, the k value for number of IQR to use as threshold, and the list of columns. Outputs a dataframe without the outliers.
     '''
     # Create a column that will label our rows as containing an outlier value or not
     num_obs = df.shape[0]
