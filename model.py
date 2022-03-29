@@ -15,7 +15,7 @@ def model_feature_selection(train, validate, test, to_dummy, features_to_scale, 
     X_validate = pd.get_dummies(validate, columns = to_dummy, drop_first=True)[columns_to_use]
     X_test = pd.get_dummies(test, columns = to_dummy, drop_first=True)[columns_to_use]
     
-    X_train_scaled, X_validate_scaled, X_test_scaled = wrangle.scale_data(X_train, X_validate, X_test,features_to_scale)
+    X_train_scaled, X_validate_scaled, X_test_scaled = wrangle.scale_data(X_train, X_validate, X_test,features_to_scale, 'Standard')
     
     y_train = train[['tax_value']]
     y_validate = validate[['tax_value']]

@@ -77,7 +77,7 @@ def wrangle_zillow():
     df["bathroom_cat"] = df.bathroom.apply(lambda row: bathroom_mapper(row))
 
 
-    df["has_garage"] = np.where(df.garage>0, True, False)
+    df["has_garage"] = np.where(df.garage>0, 1, 0)
 
     df["bed_to_bath"] = (df.bedroom/df.bathroom).replace(np.inf, 0).fillna(0)
 
@@ -112,13 +112,22 @@ def split_data(df, train_size_vs_train_test = 0.8, train_size_vs_train_val = 0.7
     
     return train, validate, test
 
-def scale_data(train, validate, test, features_to_scale):
+def scale_data(train, validate, test, features_to_scale, scaler_type):
     """Scales data using MinMax Scaler. 
     Accepts train, validate, and test datasets as inputs as well as a list of the features to scale. 
     Returns dataframe with scaled values added on as columns"""
     
     # Fit the scaler to train data only
-    scaler = sklearn.preprocessing.MinMaxScaler()
+    if scaler_type == 'MinMax':
+        scaler = sklearn.preprocessing.MinMaxScaler()
+    elif scaler_type == 'Standard':
+        scaler = sklearn.preprocessing.StandardScaler()
+    elif scaler_type == 'Robust':
+        scaler = sklearn.preprocessing.RobustScaler()
+    else:
+        print("Invalid scaler entry, using MinMax")
+        scaler = sklearn.preprocessing.MinMaxScaler()
+        
     scaler.fit(train[features_to_scale])
     
     # Generate a list of the new column names with _scaled added on
@@ -151,6 +160,29 @@ def remove_outliers(df, k, col_list):
         
         upper_bound = q3 + k * iqr   # get upper bound
         lower_bound = q1 - k * iqr   # get lower bound
+
+        # update the outlier label any time that the value is outside of boundaries
+        df['outlier'] = np.where(((df[col] < lower_bound) | (df[col] > upper_bound)) & (df.outlier == False), True, df.outlier)
+    
+    df = df[df.outlier == False]
+    df.drop(columns=['outlier'], inplace=True)
+    print(f"Number of observations removed: {num_obs - df.shape[0]}")
+        
+    return df
+
+def remove_outliers_std(df, k, col_list):
+    ''' Removes outliers based on multiple of standard devisation from mean. Accepts as arguments the dataframe, the k value for number of standard deviations to use as threshold, and the list of columns. Outputs a dataframe without the outliers.
+    '''
+    # Create a column that will label our rows as containing an outlier value or not
+    num_obs = df.shape[0]
+    df['outlier'] = False
+    for col in col_list:
+
+        average = df[col].mean()  # get mean
+        standard_deviation = df[col].std() # get standard deviation
+        
+        upper_bound = average + k * standard_deviation   # get upper bound
+        lower_bound = average - k * standard_deviation  # get lower bound
 
         # update the outlier label any time that the value is outside of boundaries
         df['outlier'] = np.where(((df[col] < lower_bound) | (df[col] > upper_bound)) & (df.outlier == False), True, df.outlier)
