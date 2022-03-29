@@ -20,13 +20,21 @@ The goal of this project was to identify key drivers of property value for singl
 ### Initial Questions and Hypotheses
 
 1. Does the number of bathrooms affect the home's tax value?
+    - I suspect a greater number would increase the tax value
 2. Does the number of bedrooms affect the home's tax value?
+    - I suspect a greater number would increase the tax value
 3. Does the square footage of the home affect tax value?
-4. Does the ratio of bedrooms to bathroooms have any effect on tax value?
-5. Does whether a home includes a pool or garage have a significant effect on the home's tax value?
-6. How much does the location of the home affect home value?
-7. Does the home's living space, defined as the square footage not including bathrooms and bedrooms, affect the home's tax value?
-8. Does the home's age affect the home's tax value?
+    - Larger homes are probably more valuable
+4. Does the home's age affect the home's tax value?
+    - I suspect older homes are less valuable but then again there are some historic homes that could be more valuable. 
+5. How much does the location of the home affect home value?
+    - I suspect this is a key driver. With this dataset I only have county data but believe more localized neighborhood data is important.
+6. Does the ratio of bedrooms to bathroooms have any effect on tax value?
+    - I'm not sure if this would have a very strong effect, but worth checking
+7. Does whether a home includes a pool or garage have a significant effect on the home's tax value?
+    - Having these additional features should increase the home's value
+8. Does the home's living space, defined as the square footage not including bathrooms and bedrooms, affect the home's tax value?
+    - More living space is likely more valuable
 
 
 ### Data Dictionary
